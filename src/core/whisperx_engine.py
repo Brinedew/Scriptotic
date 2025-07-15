@@ -62,8 +62,11 @@ class WhisperXEngine:
             print(f"DEBUG: Starting WhisperX transcription of: {audio_path}")
         if self.progress_callback: self.progress_callback(30, "Transcribing audio...")
         
-        # Use smaller batch size for better memory management
-        batch_size = 8 if self.device == "cuda" else 4
+        # Use conservative batch size for Windows stability
+        batch_size = 4 if self.device == "cuda" else 2
+        if self.debug:
+            print(f"DEBUG: Starting transcription with batch_size={batch_size}")
+        
         whisper_result = self.model.transcribe(audio_path, batch_size=batch_size)
         if self.debug:
             print(f"DEBUG: Transcription completed - {len(whisper_result['segments'])} segments")
@@ -73,13 +76,24 @@ class WhisperXEngine:
         # ── alignment to word-level ───────────────────────────────────
         if self.debug:
             print(f"DEBUG: Starting word-level alignment...")
-        # Get alignment model metadata
-        alignment_model, metadata = whisperx.load_align_model(language_code="en", device=self.device)
-        whisper_result = whisperx.align(whisper_result["segments"],
-                                        alignment_model, metadata,
-                                        audio_path, self.device)
-        if self.debug:
-            print(f"DEBUG: Word alignment completed")
+        
+        try:
+            # Get alignment model metadata
+            alignment_model, metadata = whisperx.load_align_model(language_code="en", device=self.device)
+            if self.debug:
+                print(f"DEBUG: Alignment model loaded successfully")
+            
+            whisper_result = whisperx.align(whisper_result["segments"],
+                                            alignment_model, metadata,
+                                            audio_path, self.device)
+            if self.debug:
+                print(f"DEBUG: Word alignment completed")
+        except Exception as align_error:
+            print(f"DEBUG: Word alignment failed: {align_error}")
+            # Continue without word-level alignment
+            if self.debug:
+                print(f"DEBUG: Continuing without word-level alignment")
+            pass
 
         # Skip diarization if no speaker names provided (for faster testing)
         if not speaker_names:

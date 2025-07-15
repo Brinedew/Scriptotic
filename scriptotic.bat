@@ -116,9 +116,12 @@ exit /b %errorlevel%
 :install_packages
 echo Installing packages...
 python -m pip install --upgrade pip || exit /b 1
-python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124 || (
-    python -m pip install torch torchvision torchaudio || exit /b 1
+echo Installing PyTorch 2.2.2 with correct cuDNN libraries...
+python -m pip install "torch==2.2.2" "torchvision==0.17.2" "torchaudio==2.2.2" --index-url https://download.pytorch.org/whl/cu121 || (
+    python -m pip install "torch==2.2.2" "torchvision==0.17.2" "torchaudio==2.2.2" || exit /b 1
 )
+echo Installing compatible versions to avoid Windows crash...
+python -m pip install "faster-whisper==1.0.0" "ctranslate2==4.4.0" || exit /b 1
 python -m pip install whisperx yt-dlp pyannote.audio huggingface-hub transformers || exit /b 1
 
 echo Verifying installation...

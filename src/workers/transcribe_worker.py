@@ -9,30 +9,30 @@ import sys
 import json
 import argparse
 
-# Fix sys.path to prevent namespace collision with project root
-project_root = os.path.dirname(os.path.abspath(__file__))
-# Remove all variations of project root from sys.path
-paths_to_remove = [
-    project_root,
-    os.path.normpath(project_root),
-    project_root.replace('\\', '/'),
-    project_root.replace('/', '\\'),
-    '',  # Empty string (current directory)
-    '.'  # Current directory
-]
-for path in paths_to_remove:
-    while path in sys.path:
-        sys.path.remove(path)
+# Fix sys.path for proper imports when running as subprocess
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(os.path.dirname(script_dir))  # Go up two levels: workers -> src -> project_root
+core_dir = os.path.join(project_root, 'src', 'core')
 
-# Add the cuDNN DLL directories
+# Add project root and core directory to sys.path for imports
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+if core_dir not in sys.path:
+    sys.path.insert(0, core_dir)
+
+# Add the cuDNN DLL directories using correct project root path
 if sys.platform == "win32":
     import pathlib
-    script_dir = pathlib.Path(__file__).resolve().parent
-    venv = script_dir / "venv"
+    venv = pathlib.Path(project_root) / "venv"  # Use project_root calculated above
+    print(f"DEBUG: Looking for DLLs in venv: {venv}", file=sys.stderr)
     for sub in ("nvidia/cudnn/bin", "nvidia/cublas/bin"):
         p = venv / "Lib" / "site-packages" / sub
+        print(f"DEBUG: Checking DLL path: {p}, exists: {p.exists()}", file=sys.stderr)
         if p.exists():
             os.add_dll_directory(str(p))
+            print(f"DEBUG: Added DLL directory: {p}", file=sys.stderr)
+        else:
+            print(f"DEBUG: DLL directory not found: {p}", file=sys.stderr)
 
 # Import only what we absolutely need
 try:
