@@ -43,18 +43,78 @@ if %errorlevel% neq 0 (
 
 echo Upgrading pip...
 python -m pip install --upgrade pip
+if %errorlevel% neq 0 (
+    echo ERROR: Failed to upgrade pip
+    pause
+    exit /b 1
+)
 
 echo Installing CUDA-enabled PyTorch...
 python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+if %errorlevel% neq 0 (
+    echo ERROR: Failed to install PyTorch with CUDA
+    echo Trying CPU version as fallback...
+    python -m pip install torch torchvision torchaudio
+    if %errorlevel% neq 0 (
+        echo ERROR: Failed to install PyTorch at all
+        pause
+        exit /b 1
+    )
+)
+
+echo Verifying PyTorch installation...
+python -c "import torch; print('PyTorch version:', torch.__version__)"
+if %errorlevel% neq 0 (
+    echo ERROR: PyTorch installation verification failed
+    pause
+    exit /b 1
+)
 
 echo Installing WhisperX and dependencies...
 python -m pip install whisperx yt-dlp
+if %errorlevel% neq 0 (
+    echo ERROR: Failed to install WhisperX/yt-dlp
+    pause
+    exit /b 1
+)
+
+echo Verifying WhisperX installation...
+python -c "import whisperx; print('WhisperX verification successful')"
+if %errorlevel% neq 0 (
+    echo ERROR: WhisperX installation verification failed
+    echo Trying alternative installation method...
+    python -m pip install --force-reinstall --no-deps whisperx
+    python -c "import whisperx; print('WhisperX verification successful')"
+    if %errorlevel% neq 0 (
+        echo ERROR: WhisperX still not working
+        pause
+        exit /b 1
+    )
+)
 
 echo Installing speaker diarization components...
 python -m pip install pyannote.audio
+if %errorlevel% neq 0 (
+    echo ERROR: Failed to install pyannote.audio
+    pause
+    exit /b 1
+)
 
 echo Installing additional dependencies...
 python -m pip install huggingface-hub transformers librosa soundfile
+if %errorlevel% neq 0 (
+    echo ERROR: Failed to install additional dependencies
+    pause
+    exit /b 1
+)
+
+echo Verifying all installations...
+python -c "import torch; import whisperx; import yt_dlp; import pyannote.audio; import huggingface_hub; print('All packages verified successfully')"
+if %errorlevel% neq 0 (
+    echo ERROR: Package verification failed
+    pause
+    exit /b 1
+)
 
 echo Setting HuggingFace configuration...
 setx HF_HUB_DISABLE_SYMLINKS 1

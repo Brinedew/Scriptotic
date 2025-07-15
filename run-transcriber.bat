@@ -43,12 +43,24 @@ set "PYANNOTE_DEVICE=cuda"
 
 rem ── Test WhisperX installation ─────────────────────────────────
 echo Testing WhisperX installation...
-python -c "import whisperx; print('WhisperX imported successfully')"
+python -c "import whisperx; print('WhisperX imported successfully')" >nul 2>&1
 if %errorlevel% neq 0 (
-    echo ERROR: WhisperX is not properly installed
-    echo Please run rebuild_venv.bat to reinstall dependencies
-    pause
-    exit /b 1
+    echo WhisperX not found - installing automatically...
+    echo.
+    call rebuild_venv.bat
+    if %errorlevel% neq 0 (
+        echo ERROR: Failed to install WhisperX
+        pause
+        exit /b 1
+    )
+    echo.
+    echo Retesting WhisperX installation...
+    python -c "import whisperx; print('WhisperX imported successfully')"
+    if %errorlevel% neq 0 (
+        echo ERROR: WhisperX still not working after reinstall
+        pause
+        exit /b 1
+    )
 )
 
 rem ── launch GUI/CLI ─────────────────────────────────────────────
