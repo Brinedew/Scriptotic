@@ -62,29 +62,47 @@ echo    SCRIPTOTIC SETUP
 echo ============================================
 echo.
 
-rem Check Python version
-python --version 2>nul | findstr /C:"Python 3.13" >nul
+rem Check Python version and find compatible one
+for /f "tokens=2" %%i in ('python --version 2^>^&1') do set PYTHON_VERSION=%%i
+echo Default Python version: %PYTHON_VERSION%
+
+rem Check if we have Python 3.13 (incompatible)
+echo %PYTHON_VERSION% | findstr /C:"3.13" >nul
 if %errorlevel% equ 0 (
     echo Python 3.13 detected - finding compatible version...
-    set PYTHON_CMD=py -3.12
-    py -3.12 --version >nul 2>&1 || (
-        set PYTHON_CMD=py -3.11
-        py -3.11 --version >nul 2>&1 || (
-            set PYTHON_CMD=py -3.10
-            py -3.10 --version >nul 2>&1 || (
-                set PYTHON_CMD=py -3.9
-                py -3.9 --version >nul 2>&1 || (
-                    echo ERROR: WhisperX requires Python 3.9-3.12
-                    echo Please install Python 3.12 from python.org
-                    pause
-                    exit /b 1
-                )
-            )
-        )
+    py -3.12 --version >nul 2>&1
+    if %errorlevel% equ 0 (
+        echo Using Python 3.12 for compatibility
+        set PYTHON_CMD=py -3.12
+        goto :python_found
     )
+    py -3.11 --version >nul 2>&1
+    if %errorlevel% equ 0 (
+        echo Using Python 3.11 for compatibility
+        set PYTHON_CMD=py -3.11
+        goto :python_found
+    )
+    py -3.10 --version >nul 2>&1
+    if %errorlevel% equ 0 (
+        echo Using Python 3.10 for compatibility
+        set PYTHON_CMD=py -3.10
+        goto :python_found
+    )
+    py -3.9 --version >nul 2>&1
+    if %errorlevel% equ 0 (
+        echo Using Python 3.9 for compatibility
+        set PYTHON_CMD=py -3.9
+        goto :python_found
+    )
+    echo ERROR: WhisperX requires Python 3.9-3.12
+    echo Please install Python 3.12 from python.org
+    pause
+    exit /b 1
 ) else (
     set PYTHON_CMD=python
 )
+
+:python_found
 
 echo Creating virtual environment...
 %PYTHON_CMD% -m venv venv || exit /b 1
