@@ -19,7 +19,8 @@ Scriptotic is a Windows tool that downloads YouTube videos, extracts the audio, 
 - **Windows 10 or 11** (64-bit)
 - **NVIDIA GPU** (RTX 20-series or newer recommended for best performance)
 - **12GB+ RAM** (16GB+ recommended for large models)
-- **10GB+ free disk space** (for models and temporary files)
+- **10GB+ free disk space** (for AI models and temporary files)
+- **Stable internet connection** (for first-time setup only)
 
 ### Accounts You'll Need
 - **HuggingFace Account**: Free account at [huggingface.co](https://huggingface.co) for AI models
