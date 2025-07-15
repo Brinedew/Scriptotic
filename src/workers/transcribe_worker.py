@@ -80,8 +80,18 @@ def main():
             hf_token=args.hf_token or os.getenv("HUGGINGFACE_TOKEN")
         )
         
-        # Perform transcription
-        segments, diarization_method = engine.transcribe_with_speakers(args.audio_file, speaker_names=speaker_names)
+        # Perform transcription with memory management
+        try:
+            print(f"DEBUG: Starting transcription of {args.audio_file}", file=sys.stderr)
+            segments, diarization_method = engine.transcribe_with_speakers(args.audio_file, speaker_names=speaker_names)
+            print(f"DEBUG: Transcription completed successfully", file=sys.stderr)
+        except Exception as transcribe_error:
+            print(f"DEBUG: Transcription failed with error: {transcribe_error}", file=sys.stderr)
+            print(f"DEBUG: Error type: {type(transcribe_error).__name__}", file=sys.stderr)
+            # Try to clean up memory
+            import gc
+            gc.collect()
+            raise transcribe_error
         
         # Output result as JSON to stdout (use stderr for debug output)
         result = {

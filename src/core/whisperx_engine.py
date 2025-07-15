@@ -27,11 +27,28 @@ class WhisperXEngine:
 
         if self.debug:
             print(f"DEBUG: About to call whisperx.load_model({model_size}, {self.device})...")
+        
         # whisperx automatically grabs the correct English checkpoints
-        self.model = whisperx.load_model(model_size, self.device, compute_type="float16" if self.device=="cuda" else "int8")
-        if self.debug:
-            print(f"DEBUG: whisperx.load_model() returned successfully!")
-            print(f"DEBUG: WhisperX model loaded successfully")
+        try:
+            self.model = whisperx.load_model(model_size, self.device, compute_type="float16" if self.device=="cuda" else "int8")
+            if self.debug:
+                print(f"DEBUG: whisperx.load_model() returned successfully!")
+                print(f"DEBUG: WhisperX model loaded successfully")
+        except Exception as e:
+            print(f"DEBUG: Failed to load WhisperX model on {self.device}: {e}")
+            if self.device == "cuda":
+                print(f"DEBUG: Falling back to CPU")
+                self.device = "cpu"
+                self.dtype = torch.float32
+                try:
+                    self.model = whisperx.load_model(model_size, self.device, compute_type="int8")
+                    if self.debug:
+                        print(f"DEBUG: WhisperX model loaded successfully on CPU")
+                except Exception as cpu_error:
+                    print(f"DEBUG: Failed to load model on CPU too: {cpu_error}")
+                    raise cpu_error
+            else:
+                raise e
 
     # ------------------------------------------------------------------
     # Public API identical to old engine
@@ -45,7 +62,9 @@ class WhisperXEngine:
             print(f"DEBUG: Starting WhisperX transcription of: {audio_path}")
         if self.progress_callback: self.progress_callback(30, "Transcribing audio...")
         
-        whisper_result = self.model.transcribe(audio_path, batch_size=16)
+        # Use smaller batch size for better memory management
+        batch_size = 8 if self.device == "cuda" else 4
+        whisper_result = self.model.transcribe(audio_path, batch_size=batch_size)
         if self.debug:
             print(f"DEBUG: Transcription completed - {len(whisper_result['segments'])} segments")
 
