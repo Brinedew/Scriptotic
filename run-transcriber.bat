@@ -19,7 +19,14 @@ if not exist "venv\Scripts\activate.bat" (
 )
 
 rem ── activate venv ───────────────────────────────────────────────
+echo Activating virtual environment...
 call venv\Scripts\activate.bat
+if %errorlevel% neq 0 (
+    echo ERROR: Failed to activate virtual environment
+    pause
+    exit /b 1
+)
+echo Virtual environment activated successfully
 
 rem ── prepend OUR ffmpeg first ───────────────────────────────────
 if exist "ffmpeg-7.1.1-essentials_build\ffmpeg_bin" (
@@ -34,12 +41,25 @@ if exist "%VIRTUAL_ENV%\Lib\site-packages\nvidia\cudnn\bin" (
 rem ── your usual flags ───────────────────────────────────────────
 set "PYANNOTE_DEVICE=cuda"
 
+rem ── Test WhisperX installation ─────────────────────────────────
+echo Testing WhisperX installation...
+python -c "import whisperx; print('WhisperX imported successfully')"
+if %errorlevel% neq 0 (
+    echo ERROR: WhisperX is not properly installed
+    echo Please run rebuild_venv.bat to reinstall dependencies
+    pause
+    exit /b 1
+)
+
 rem ── launch GUI/CLI ─────────────────────────────────────────────
 if "%~1"=="" (
     echo Launching Scriptotic GUI...
+    echo Current directory: %CD%
+    echo Python path: %PATH%
     python src\core\scriptotic.py
 ) else (
     echo Launching Scriptotic CLI...
+    echo Current directory: %CD%
     python src\core\scriptotic.py %*
 )
 

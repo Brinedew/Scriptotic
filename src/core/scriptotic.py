@@ -27,17 +27,36 @@ if sys.platform == "win32":
 faulthandler.enable()
 # faulthandler.dump_traceback_later(30, repeat=True)   # disabled - causes timeouts during model downloads
 
+# Fix import paths
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(os.path.dirname(script_dir))
+sys.path.insert(0, project_root)
+sys.path.insert(0, script_dir)
+
+# Import WhisperX engine
 try:
     from whisperx_engine import WhisperXEngine as TranscriptionEngine
 except ImportError:
-    from src.core.whisperx_engine import WhisperXEngine as TranscriptionEngine
+    try:
+        from src.core.whisperx_engine import WhisperXEngine as TranscriptionEngine
+    except ImportError:
+        print(f"Error: Cannot find whisperx_engine.py")
+        print(f"Script directory: {script_dir}")
+        print(f"Project root: {project_root}")
+        print(f"Python path: {sys.path}")
+        sys.exit(1)
 
 # Token management
 try:
     from config.token_manager import TokenManager
 except ImportError:
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
-    from config.token_manager import TokenManager
+    try:
+        sys.path.insert(0, os.path.join(project_root, 'config'))
+        from token_manager import TokenManager
+    except ImportError:
+        print(f"Error: Cannot find token_manager.py")
+        print(f"Looking in: {os.path.join(project_root, 'config')}")
+        sys.exit(1)
 
 # Core imports for WhisperX
 try:
