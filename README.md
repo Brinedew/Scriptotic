@@ -72,6 +72,11 @@ cd Scriptotic
    ```bash
    pip install -r requirements.txt
    ```
+   
+   **Note**: For CUDA support, you may need to install PyTorch with CUDA manually:
+   ```bash
+   pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu124
+   ```
 
 ### Step 5: Set Up HuggingFace Token
 
@@ -133,8 +138,11 @@ python src\core\scriptotic.py "https://www.youtube.com/watch?v=VIDEO_ID" --model
 For easier launching, use the included batch file:
 
 ```bash
+# Double-click run-transcriber.bat to launch GUI, or use from command line:
 run-transcriber.bat "https://www.youtube.com/watch?v=VIDEO_ID" --names "Alice,Bob" --output "transcript.txt"
 ```
+
+**Note**: The batch file will check if your virtual environment is set up correctly and provide helpful error messages if not.
 
 ## Output Format
 
@@ -155,6 +163,11 @@ The transcript will include:
 **"No module named 'whisperx'"**
 - Make sure you activated the virtual environment: `venv\Scripts\activate`
 - Try reinstalling: `pip install -r requirements.txt`
+
+**"Double-clicking run-transcriber.bat does nothing"**
+- You need to set up the virtual environment first (see installation steps)
+- The batch file will show an error message if the virtual environment isn't found
+- Try running from Command Prompt to see error messages
 
 **"CUDA out of memory"**
 - Use a smaller model (tiny, base, or small)

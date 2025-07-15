@@ -379,7 +379,7 @@ class TranscriptGUI:
             model_size = self.model_var.get()
             # Get the project root directory (two levels up from src/core/)
             project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-            worker_path = os.path.join(project_root, 'transcribe_worker.py')
+            worker_path = os.path.join(project_root, 'src', 'workers', 'transcribe_worker.py')
             
             cmd = [
                 sys.executable, worker_path,
@@ -551,7 +551,7 @@ def cli_main():
         
         # Get the project root directory (two levels up from src/core/)
         project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        worker_path = os.path.join(project_root, 'transcribe_worker.py')
+        worker_path = os.path.join(project_root, 'src', 'workers', 'transcribe_worker.py')
         
         cmd = [
             sys.executable, worker_path,
