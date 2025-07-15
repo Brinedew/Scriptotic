@@ -31,9 +31,10 @@ Scriptotic is a Windows tool that downloads YouTube videos, extracts the audio, 
 ### Step 1: Install Python (if not already installed)
 
 1. Go to [python.org](https://www.python.org/downloads/)
-2. Download **Python 3.8** or newer
-3. During installation, **IMPORTANT: Check "Add Python to PATH"**
-4. Restart your computer after installation
+2. Download **Python 3.12** (recommended) or Python 3.9-3.12
+3. **IMPORTANT: Do NOT use Python 3.13** - it's too new for WhisperX
+4. During installation, **IMPORTANT: Check "Add Python to PATH"**
+5. Restart your computer after installation
 
 ### Step 2: Install CUDA (for GPU acceleration)
 
@@ -55,7 +56,7 @@ git clone https://github.com/brinedew/Scriptotic.git
 
 ### Step 4: Run Scriptotic
 
-**That's it! Just double-click `run-transcriber.bat`**
+**That's it! Just double-click `scriptotic.bat`**
 
 The first time you run it, it will automatically:
 - Set up the Python environment
@@ -81,7 +82,7 @@ This takes about 5-10 minutes the first time, then it's instant after that.
 
 ### Basic Usage (Recommended)
 
-1. **Double-click `run-transcriber.bat`** to launch the GUI
+1. **Double-click `scriptotic.bat`** to launch the GUI
 2. **First time**: You'll be prompted to enter your HuggingFace token
 3. Enter the YouTube video URL
 4. Enter speaker names (comma-separated, e.g., "Alice, Bob, Charlie")
@@ -101,13 +102,16 @@ You can also use Scriptotic from the command line:
 
 ```bash
 # Basic usage (launches GUI)
-run-transcriber.bat
+scriptotic.bat
 
 # Direct CLI usage
-run-transcriber.bat "https://www.youtube.com/watch?v=VIDEO_ID" --names "Alice,Bob,Charlie" --output "transcript.txt"
+scriptotic.bat "https://www.youtube.com/watch?v=VIDEO_ID" --names "Alice,Bob,Charlie" --output "transcript.txt"
 
 # With specific model
-run-transcriber.bat "https://www.youtube.com/watch?v=VIDEO_ID" --model large --output "transcript.txt"
+scriptotic.bat "https://www.youtube.com/watch?v=VIDEO_ID" --model large --output "transcript.txt"
+
+# Reset environment (if having issues)
+scriptotic.bat --reset
 ```
 
 ## Output Format
@@ -126,15 +130,21 @@ The transcript will include:
 
 ### Common Issues
 
-**"Double-clicking run-transcriber.bat does nothing"**
+**"Double-clicking scriptotic.bat does nothing"**
 - Make sure Python is installed and "Add Python to PATH" was checked during installation
 - Try running from Command Prompt to see error messages
 - Make sure you extracted the ZIP file completely (don't run from inside the ZIP)
+- If still having issues, try: `scriptotic.bat --reset`
 
 **"Python is not installed or not in PATH"**
-- Download Python from python.org
+- Download Python 3.12 from python.org (NOT Python 3.13)
 - During installation, check "Add Python to PATH"
 - Restart your computer after installation
+
+**"WhisperX requires Python 3.9-3.12"**
+- Python 3.13 is too new for WhisperX
+- Install Python 3.12 from python.org
+- The setup script will automatically use the correct Python version if you have multiple versions installed
 
 **"CUDA out of memory"**
 - Use a smaller model (tiny, base, or small)
