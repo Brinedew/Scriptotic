@@ -1,19 +1,21 @@
 @echo off
 cd /d "%~dp0"
 
-rem ── Check if venv exists, if not provide helpful message ───────
+rem ── Check if venv exists, if not run setup automatically ───────
 if not exist "venv\Scripts\activate.bat" (
     echo.
-    echo ERROR: Python virtual environment not found!
+    echo First time running Scriptotic - setting up automatically...
     echo.
-    echo Please follow the installation instructions in README.md:
-    echo 1. Create virtual environment: python -m venv venv
-    echo 2. Activate it: venv\Scripts\activate
-    echo 3. Install dependencies: pip install -r requirements.txt
+    call rebuild_venv.bat
+    if %errorlevel% neq 0 (
+        echo.
+        echo Setup failed. Please check the error messages above.
+        pause
+        exit /b 1
+    )
     echo.
-    echo Then run this batch file again.
-    pause
-    exit /b 1
+    echo Setup completed! Starting Scriptotic...
+    echo.
 )
 
 rem ── activate venv ───────────────────────────────────────────────

@@ -27,12 +27,12 @@ Scriptotic is a Windows tool that downloads YouTube videos, extracts the audio, 
 
 ## Installation Guide
 
-### Step 1: Download and Install Python
+### Step 1: Install Python (if not already installed)
 
 1. Go to [python.org](https://www.python.org/downloads/)
-2. Download **Python 3.12** (or newer)
-3. During installation, **check "Add Python to PATH"**
-4. Verify installation: Open Command Prompt and type `python --version`
+2. Download **Python 3.8** or newer
+3. During installation, **IMPORTANT: Check "Add Python to PATH"**
+4. Restart your computer after installation
 
 ### Step 2: Install CUDA (for GPU acceleration)
 
@@ -50,35 +50,20 @@ Scriptotic is a Windows tool that downloads YouTube videos, extracts the audio, 
 **Option B: Git Clone (If you have Git)**
 ```bash
 git clone https://github.com/brinedew/Scriptotic.git
-cd Scriptotic
 ```
 
-### Step 4: Set Up Python Environment
+### Step 4: Run Scriptotic
 
-1. Open Command Prompt **as Administrator**
-2. Navigate to the Scriptotic folder:
-   ```bash
-   cd C:\Scriptotic
-   ```
-3. Create a virtual environment:
-   ```bash
-   python -m venv venv
-   ```
-4. Activate the virtual environment:
-   ```bash
-   venv\Scripts\activate
-   ```
-5. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-   
-   **Note**: For CUDA support, you may need to install PyTorch with CUDA manually:
-   ```bash
-   pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu124
-   ```
+**That's it! Just double-click `run-transcriber.bat`**
 
-### Step 5: Set Up HuggingFace Token
+The first time you run it, it will automatically:
+- Set up the Python environment
+- Download and install all required AI models
+- Configure everything for you
+
+This takes about 5-10 minutes the first time, then it's instant after that.
+
+### Step 5: Set Up HuggingFace Token (First Run Only)
 
 1. Go to [huggingface.co](https://huggingface.co) and create a free account
 2. Go to [Settings → Access Tokens](https://huggingface.co/settings/tokens)
@@ -93,56 +78,36 @@ cd Scriptotic
 
 ## How to Use
 
-### Using the GUI (Recommended)
+### Basic Usage (Recommended)
 
-1. Open Command Prompt and navigate to Scriptotic folder
-2. Activate the virtual environment:
-   ```bash
-   venv\Scripts\activate
-   ```
-3. Launch the GUI:
-   ```bash
-   python src\core\scriptotic.py
-   ```
-4. **First time**: You'll be prompted to enter your HuggingFace token
-5. Enter the YouTube video URL
-6. Enter speaker names (comma-separated, e.g., "Alice, Bob, Charlie")
-7. Choose model size (larger = better quality, slower):
-   - **tiny**: Fastest, lowest quality
-   - **base**: Good balance of speed and quality
-   - **small**: Better quality, slower
-   - **medium**: High quality, much slower
-   - **large**: Best quality, very slow
-8. Click "Generate Transcript"
-9. Wait for processing (can take 5-30 minutes depending on video length and model)
-10. Transcript will be saved to the specified file
+1. **Double-click `run-transcriber.bat`** to launch the GUI
+2. **First time**: You'll be prompted to enter your HuggingFace token
+3. Enter the YouTube video URL
+4. Enter speaker names (comma-separated, e.g., "Alice, Bob, Charlie")
+5. Choose model size (larger = better quality, slower):
+   - **tiny**: Fastest, lowest quality (~2 minutes for 1-hour video)
+   - **base**: Good balance of speed and quality (~5 minutes for 1-hour video)
+   - **small**: Better quality, slower (~10 minutes for 1-hour video)
+   - **medium**: High quality, much slower (~20 minutes for 1-hour video)
+   - **large**: Best quality, very slow (~30+ minutes for 1-hour video)
+6. Click "Generate Transcript"
+7. Wait for processing
+8. Transcript will be saved to the specified file
 
-### Using Command Line
+### Command Line Usage
+
+You can also use Scriptotic from the command line:
 
 ```bash
-# Activate virtual environment
-venv\Scripts\activate
+# Basic usage (launches GUI)
+run-transcriber.bat
 
-# Basic usage
-python src\core\scriptotic.py "https://www.youtube.com/watch?v=VIDEO_ID"
-
-# With speaker names and output file
-python src\core\scriptotic.py "https://www.youtube.com/watch?v=VIDEO_ID" --names "Alice,Bob,Charlie" --output "transcript.txt"
+# Direct CLI usage
+run-transcriber.bat "https://www.youtube.com/watch?v=VIDEO_ID" --names "Alice,Bob,Charlie" --output "transcript.txt"
 
 # With specific model
-python src\core\scriptotic.py "https://www.youtube.com/watch?v=VIDEO_ID" --model large --output "transcript.txt"
+run-transcriber.bat "https://www.youtube.com/watch?v=VIDEO_ID" --model large --output "transcript.txt"
 ```
-
-### Using the Windows Batch File
-
-For easier launching, use the included batch file:
-
-```bash
-# Double-click run-transcriber.bat to launch GUI, or use from command line:
-run-transcriber.bat "https://www.youtube.com/watch?v=VIDEO_ID" --names "Alice,Bob" --output "transcript.txt"
-```
-
-**Note**: The batch file will check if your virtual environment is set up correctly and provide helpful error messages if not.
 
 ## Output Format
 
@@ -160,14 +125,15 @@ The transcript will include:
 
 ### Common Issues
 
-**"No module named 'whisperx'"**
-- Make sure you activated the virtual environment: `venv\Scripts\activate`
-- Try reinstalling: `pip install -r requirements.txt`
-
 **"Double-clicking run-transcriber.bat does nothing"**
-- You need to set up the virtual environment first (see installation steps)
-- The batch file will show an error message if the virtual environment isn't found
+- Make sure Python is installed and "Add Python to PATH" was checked during installation
 - Try running from Command Prompt to see error messages
+- Make sure you extracted the ZIP file completely (don't run from inside the ZIP)
+
+**"Python is not installed or not in PATH"**
+- Download Python from python.org
+- During installation, check "Add Python to PATH"
+- Restart your computer after installation
 
 **"CUDA out of memory"**
 - Use a smaller model (tiny, base, or small)
@@ -188,6 +154,11 @@ The transcript will include:
 - This is normal for longer videos and larger models
 - The "large" model can take 30+ minutes for a 1-hour video
 - Consider using "base" or "small" models for faster results
+
+**Setup takes a long time**
+- The first-time setup downloads several GB of AI models
+- This is normal and only happens once
+- Make sure you have a stable internet connection
 
 ### Getting Help
 
